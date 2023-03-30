@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pacman-service
+  labels:
+    app: pacman
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      nodePort: 30002
+  selector:
+    app: pacman
+    tier: ui
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongodb-configmap
+  labels:
+    app: pacman
+data:
+  database_url: pacman-mongodb-0.pacman-mongodb-headless,pacman-mongodb-1.pacman-mongodb-headless
+  replicaset_name: rs0
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pacman
+  labels:
+    app: pacman
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pacman
+      tier: ui
+  template:
+    metadata:
+      labels:
+        app: pacman
+        tier: ui
+    spec:
+      containers:
+      - image: mattbator/pacman:latest
+        name: pacman
+        ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+        startupProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 10
+          failureThreshold: 10
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          failureThreshold: 1
+          periodSeconds: 10
+        readinessProbe:
+          initialDelaySeconds: 5
+          httpGet:
+            path: /
+            port: 8080
+        env:
+        - name: MONGO_SERVICE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: mongodb-configmap
+              key: database_url
+        - name: MONGO_AUTH_USER
+          value: root
+        - name: MONGO_AUTH_PWD
+          valueFrom:
+            secretKeyRef:
+              key: mongodb-root-password
+              name: pacman-mongodb
+        - name: MONGO_DATABASE
+          value: pacman
+        - name: MONGO_REPLICA_SET
+          valueFrom:
+            configMapKeyRef:
+              name: mongodb-configmap
+              key: replicaset_name
+        - name: MY_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
