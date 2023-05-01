@@ -7,5 +7,5 @@ spec:
   containers:
   - name: my-first-pod-container
     image: busybox:1.28
-    command: ['sh', '-c', 'echo "Hello (and Goodbye) World!"']
+    command: ['sh', '-c', 'echo "Hello World!” && sleep 3600']
   restartPolicy: Never
