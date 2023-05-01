@@ -25,7 +25,7 @@ actions:
         - -c
         - |
           export MONGODB_ROOT_PASSWORD='{{ index .Phases.lockMongo.Secrets.mongoDbSecret.Data "mongodb-root-password" | toString }}'
-          mongosh --authenticationDatabase admin -u root -p "\$MONGODB_ROOT_PASSWORD" --eval="db.fsyncLock()"
+          mongosh --authenticationDatabase admin -u root -p "$MONGODB_ROOT_PASSWORD" --eval="db.fsyncLock()"
   backupPosthook:
     phases:
     - func: KubeExecAll
@@ -48,4 +48,4 @@ actions:
         - -c
         - |
           export MONGODB_ROOT_PASSWORD='{{ index .Phases.unlockMongo.Secrets.mongoDbSecret.Data "mongodb-root-password" | toString }}'
-          mongosh --authenticationDatabase admin -u root -p "\$MONGODB_ROOT_PASSWORD" --eval="db.fsyncUnlock()"
+          mongosh --authenticationDatabase admin -u root -p "$MONGODB_ROOT_PASSWORD" --eval="db.fsyncUnlock()"

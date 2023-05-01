@@ -16,6 +16,10 @@ spec:
         app: pacman
         tier: db
     spec:
+      volumes:
+      - name: mongodb-persistent-storage
+        persistentVolumeClaim:
+          claimName: mongodb-pvc
       containers:
       - name: mongodb
         image: mongo
@@ -35,7 +39,3 @@ spec:
         volumeMounts:
         - name: mongodb-persistent-storage
           mountPath: /data/db
-      volumes:
-      - name: mongodb-persistent-storage
-        persistentVolumeClaim:
-          claimName: mongodb-pvc

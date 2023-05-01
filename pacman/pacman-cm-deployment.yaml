@@ -39,12 +39,15 @@ spec:
               name: mongodb-configmap
               key: database_url
         - name: MONGO_AUTH_USER
-          value: root
+          valueFrom:
+            secretKeyRef:
+              key: username
+              name: mongodb-secret
         - name: MONGO_AUTH_PWD
           valueFrom:
             secretKeyRef:
-              key: mongodb-root-password
-              name: pacman-mongodb
+              key: password
+              name: mongodb-secret
         - name: MY_NODE_NAME
           valueFrom:
             fieldRef:

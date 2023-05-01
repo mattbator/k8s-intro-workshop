@@ -3,9 +3,9 @@ kind: PersistentVolumeClaim
 metadata:
   name: mongodb-pvc
   labels:
-    app: lab-app
+    app: pacman
 spec:
-  storageClassName: "hostpath-csi"
+  storageClassName: local-path
   accessModes:
     - ReadWriteOnce
   resources:
